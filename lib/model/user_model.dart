@@ -19,7 +19,7 @@ class UserModel {
     required this.uid,
     required this.isGuest,
     required this.karma,
-    required this.awards,
+    required this.awards, 
   });
 
 
@@ -65,8 +65,8 @@ class UserModel {
       uid: map['uid'] as String,
       isGuest: map['isGuest'] as bool,
       karma: map['karma'] as int,
-      awards: List<String>.from((map['awards'] as List<String>),
-    ));
+      awards: List<String>.from(map['awards'] ?? [])
+    );
   }
 
   // this method converts the UserModel object to a JSON string
