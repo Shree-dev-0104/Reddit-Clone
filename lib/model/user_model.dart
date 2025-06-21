@@ -12,7 +12,7 @@ class UserModel {
   final int karma;
   final List<String> awards;
   UserModel({ // this is the constructor for the UserModel class
-    // these are the parameters that we need to create a UserModel object
+    // these are the parameters that we need to create a UserMo del object
     required this.name,
     required this.profilePic,
     required this.banner,
