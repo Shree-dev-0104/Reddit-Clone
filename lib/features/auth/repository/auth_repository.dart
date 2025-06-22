@@ -13,79 +13,80 @@ import 'package:reddit/model/user_model.dart';
 
 import '../../../core/constants/firebase_constants.dart';
 
-final authRepositoryProvider = Provider((ref)=> AuthRepository( 
-  firestore: ref.read(firestoreProvider),
-  auth: ref.read(authProvider),
-  googleSignIn: ref.read(googleSignInProvider),
-));
+final authRepositoryProvider = Provider((ref) => AuthRepository(
+      firestore: ref.read(firestoreProvider),
+      auth: ref.read(authProvider),
+      googleSignIn: ref.read(googleSignInProvider),
+    ));
 
 class AuthRepository {
   // the reason we are using private variables is to prevent direct access to them
-  // from outside the class, we will use getters and setters to access them  
+  // from outside the class, we will use getters and setters to access them
   final FirebaseFirestore _firestore;
   final FirebaseAuth _auth;
-  final  GoogleSignIn _googleSignIn;
+  final GoogleSignIn _googleSignIn;
 
   AuthRepository({
     required FirebaseFirestore firestore,
     required FirebaseAuth auth,
-    required GoogleSignIn googleSignIn, 
-  }): _firestore = firestore,  
+    required GoogleSignIn googleSignIn,
+  })  : _firestore = firestore,
         _auth = auth,
         _googleSignIn = googleSignIn;
 
-        CollectionReference get _users => _firestore.collection(FirebaseConstants.usersCollection);
+  CollectionReference get _users => _firestore.collection(FirebaseConstants.usersCollection);
 
-    FutureEither<UserModel> signInWithGoogle() async { 
-      try {
-        final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-        // If the user cancels the sign-in, googleUser will be null
+  Stream<User?> get authStateChange => _auth.authStateChanges(); // this will give us the current user if they are signed in or null if they are not signed in 
 
-        final googleAuth = await googleUser?.authentication;
-        // If the user cancels the sign-in, googleAuth will be null
+  FutureEither<UserModel> signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+      // If the user cancels the sign-in, googleUser will be null
 
-        final credential = GoogleAuthProvider.credential(
-          accessToken: googleAuth?.accessToken,
-          idToken: googleAuth?.idToken, 
-        );
+      final googleAuth = await googleUser?.authentication;
+      // If the user cancels the sign-in, googleAuth will be null
 
-        UserCredential userCredential = await _auth.signInWithCredential(credential);
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth?.accessToken,
+        idToken: googleAuth?.idToken,
+      );
 
-        late UserModel  userModel;
+      UserCredential userCredential =
+          await _auth.signInWithCredential(credential);
 
-        if(userCredential.additionalUserInfo!.isNewUser) {
-          userModel = UserModel(
+      late UserModel userModel;
+
+      if (userCredential.additionalUserInfo!.isNewUser) {
+        userModel = UserModel(
           uid: userCredential.user!.uid,
           name: userCredential.user!.displayName ?? 'Untitled',
           profilePic: userCredential.user!.photoURL ?? Constants.avatarDefault,
           banner: Constants.bannerDefault,
           karma: 0,
-          isGuest: true,
+          isGuest: false,
           awards: [],
         );
         await _users.doc(userCredential.user!.uid).set(userModel.toMap());
-        } else {
-          userModel = await getUserData(userCredential.user!.uid).first;
-        }
-
-        
-
-        return right(userModel);
-      }on FirebaseException catch (e) {
-        throw e.message!;
-      } catch(e) {
-        
-        return  left(Failure(e.toString()));
+      } else {
+        userModel = await getUserData(userCredential.user!.uid).first;
       }
-    }
 
-    Stream<UserModel> getUserData(String uid) {
-      return _users.doc(uid).snapshots().map((snapshot) {
-        if (snapshot.exists) {
-          return UserModel.fromMap(snapshot.data()! as Map<String, dynamic> );
-        } else {
-          throw Exception('User not found');
-        }
-      });
-    } 
+      return right(userModel);
+    } on FirebaseException catch (e) {
+      throw e.message!;
+    } catch (e) {
+      return left(Failure(e.toString()));
+    }
+  }
+
+  Stream<UserModel> getUserData(String uid) { // This method retrieves user data from Firestore based on the user's UID
+    // It returns a stream of UserModel, which allows us to listen for real-time updates
+    return _users.doc(uid).snapshots().map((snapshot) {
+      if (snapshot.exists) {
+        return UserModel.fromMap(snapshot.data()! as Map<String, dynamic>);
+      } else {
+        throw Exception('User not found');
+      }
+    });
+  }
 }

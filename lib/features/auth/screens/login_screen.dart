@@ -20,7 +20,7 @@ class LoginScreen extends ConsumerWidget {
             height: 40,
             width: 40,
           ),
-          actions: [ 
+          actions: [
             TextButton(
               onPressed: () {},
               child: const Text(
@@ -57,7 +57,7 @@ class LoginScreen extends ConsumerWidget {
                     ),
                   ),
                   const SizedBox(height: 30),
-                  const SignInButton()
+                  const SignInButton(),
                 ],
               ));
   }
