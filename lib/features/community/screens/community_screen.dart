@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reddit/core/comman/loader.dart';
 import 'package:reddit/core/failure.dart';
 import 'package:reddit/features/auth/controller/auth_controller.dart';
+import 'package:routemaster/routemaster.dart';
 
 import '../controller/community_controller.dart';
 
@@ -13,6 +13,11 @@ class CommunityScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+
+    void navigateToRouteTools(BuildContext context, ) {
+      Routemaster.of(context).push('/mod-tools/$name');
+    }
+
     final user = ref.watch(userProvider);  
 
     return Scaffold(
@@ -56,7 +61,7 @@ class CommunityScreen extends ConsumerWidget {
                               children: [
                                 Text(
                                   'r/${community.name}',
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     fontSize: 19,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -64,10 +69,12 @@ class CommunityScreen extends ConsumerWidget {
                                 community.mods.contains(user?.uid) ?
                                 
                                 OutlinedButton(
-                                  onPressed: () {},
+                                  onPressed: () {
+                                      navigateToRouteTools(context);
+                                  },
                                   style: ElevatedButton.styleFrom(
                                     padding:
-                                        EdgeInsets.symmetric(horizontal: 25),
+                                        const EdgeInsets.symmetric(horizontal: 25),
                                     shape: const RoundedRectangleBorder(
                                       borderRadius:
                                           BorderRadius.all(Radius.circular(20)),
@@ -79,7 +86,7 @@ class CommunityScreen extends ConsumerWidget {
                                   onPressed: () {},
                                   style: ElevatedButton.styleFrom(
                                     padding:
-                                        EdgeInsets.symmetric(horizontal: 25),
+                                        const EdgeInsets.symmetric(horizontal: 25),
                                     shape: const RoundedRectangleBorder(
                                       borderRadius:
                                           BorderRadius.all(Radius.circular(20)),
@@ -87,11 +94,11 @@ class CommunityScreen extends ConsumerWidget {
                                   ),
                                   child:  Text(community.members.contains(user?.uid) ?  'Joined' : 'Join'),
                                 ) 
-
+ 
                               ],
                             ),
-                            Padding(
-                              padding: const EdgeInsets.only(
+                            const Padding(
+                              padding: EdgeInsets.only(
                                 top: 10,
                               ),
                             ),
@@ -111,7 +118,7 @@ class CommunityScreen extends ConsumerWidget {
               return Center(
                 child: Text(
                   'Error: ${error is Failure ? error.message : 'Something went wrong'}',
-                  style: TextStyle(color: Colors.red),
+                  style: const TextStyle(color: Colors.red),
                 ),
               );
             },
