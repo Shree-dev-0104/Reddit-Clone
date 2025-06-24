@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:reddit/core/comman/loader.dart';
 import 'package:routemaster/routemaster.dart';
+
+import '../../community/controller/community_controller.dart';
 
 class CommunityListDrawer extends ConsumerWidget {
   const CommunityListDrawer({super.key});
@@ -23,6 +26,28 @@ class CommunityListDrawer extends ConsumerWidget {
               navigateToCreateCommunity(context);
             },
           ),
+          ref.watch(userCommunityProvider).when(
+                data: (communities) {
+                  return Expanded(
+                    child: ListView.builder(
+                      itemCount: communities.length,
+                      itemBuilder: (context, index) {
+                        final community = communities[index];
+                        return ListTile(
+                          leading: CircleAvatar(
+                            backgroundImage: NetworkImage(community.avatar),
+                          ),
+                          title: Text('r/${community.name}'),
+                          onTap: () {
+                          },
+                        );
+                      },
+                    ),
+                  );
+                },
+                error: (error, stackTrace) => Center(child: Text(error.toString())),
+                loading: () => const Loader(),
+              ),
         ],
       )),
     );
