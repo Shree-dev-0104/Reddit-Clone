@@ -23,6 +23,12 @@ final communityControllerProvider =
   );
 });
 
+final getCommunityByNameProvider =
+    StreamProvider.family<Community, String>((ref, name) {
+  final communityController = ref.watch(communityControllerProvider.notifier);
+  return communityController.getCommunityByName(name); 
+});
+
 class CommunityController extends StateNotifier<bool> {
   final CommunityRepository _communityRepository;
   final Ref _ref;
@@ -50,6 +56,10 @@ class CommunityController extends StateNotifier<bool> {
       Routemaster.of(context).pop();
       showSnackBar(context, 'Community created successfully');
     });
+  }
+
+  Stream<Community> getCommunityByName(String name) {
+    return _communityRepository.getCommunityByName(name);
   }
 
   Stream<List<Community>> getUserCommunities() {

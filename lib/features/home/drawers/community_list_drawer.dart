@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:reddit/core/comman/loader.dart';
 import 'package:routemaster/routemaster.dart';
 
+import '../../../model/community_model.dart';
 import '../../community/controller/community_controller.dart';
 
 class CommunityListDrawer extends ConsumerWidget {
@@ -11,6 +12,10 @@ class CommunityListDrawer extends ConsumerWidget {
 
   void navigateToCreateCommunity(BuildContext context) {
     Routemaster.of(context).push('/create-community');
+  }
+
+  void navigateToCommunity(BuildContext context, Community community) {
+    Routemaster.of(context).push('/r/${community.name}');
   }
 
   @override
@@ -39,9 +44,10 @@ class CommunityListDrawer extends ConsumerWidget {
                           ),
                           title: Text('r/${community.name}'),
                           onTap: () {
+                            navigateToCommunity(context, community);
                           },
                         );
-                      },
+                      }, 
                     ),
                   );
                 },
