@@ -103,7 +103,7 @@ class CommunityScreen extends ConsumerWidget {
                               ),
                             ),
                             Text(
-                              community.members.length.toString() + " members",
+                              "${community.members.length} members",
                             ),
                           ],
                         ),
